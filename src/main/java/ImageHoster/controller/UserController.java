@@ -28,21 +28,34 @@ public class UserController {
     //This method declares User type and UserProfile type object
     //Sets the user profile with UserProfile type object
     //Adds User type object to a model and returns 'users/registration.html' file
+    //Solving Part B Implement a new feature_Issue 1: Modified the registration method -> added model.addAttribute to include passwordTypeError.
+
     @RequestMapping("users/registration")
-    public String registration(Model model) {
+    public String registration(Model model,String error) {
         User user = new User();
         UserProfile profile = new UserProfile();
         user.setProfile(profile);
         model.addAttribute("User", user);
+        model.addAttribute("passwordTypeError",error);
         return "users/registration";
     }
 
     //This controller method is called when the request pattern is of type 'users/registration' and also the incoming request is of POST type
     //This method calls the business logic and after the user record is persisted in the database, directs to login page
+    //Solving Part B Implement a new feature_Issue 1: Modified the registerUser method -> added Regex check. If pass, accepts user creation and redirects to login page.
+    //Contd.. If the check fails, redirects back to registration page with the error message.
     @RequestMapping(value = "users/registration", method = RequestMethod.POST)
-    public String registerUser(User user) {
-        userService.registerUser(user);
-        return "redirect:/users/login";
+    public String registerUser(User user, Model model) {
+
+        if(user.getPassword().matches("^(?=.*\\d)(?=.*[a-zA-Z]).+$")){
+            userService.registerUser(user);
+            return "redirect:/users/login";
+        }
+        else{
+            String error = "Password must contain atleast 1 alphabet, 1 number & 1 special character";
+            registration(model, error);
+            return null;
+        }
     }
 
     //This controller method is called when the request pattern is of type 'users/login'
