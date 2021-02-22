@@ -41,6 +41,19 @@ public class User {
     @OneToMany(mappedBy = "user", cascade = CascadeType.REMOVE, fetch = FetchType.LAZY)
     private List<Image> images = new ArrayList<>();
 
+    //The 'users' table is mapped to 'comments' table with Many:One mapping
+    //One comment can have only one user (owner) but one user can have multiple comments
+    @OneToMany(mappedBy = "user", cascade = CascadeType.REMOVE, fetch = FetchType.LAZY)
+    private List<Comment> comments = new ArrayList<>(); //User added
+
+    public List<Comment> getComments() { //User added
+        return comments; //User added
+    }
+
+    public void setComments(List<Comment> comments) { //User added
+        this.comments = comments; //User added
+    }
+
     public Integer getId() {
         return id;
     }

@@ -68,6 +68,18 @@ public class Image {
         this.description = description;
         this.date = date;
     }
+    //The 'images' table is mapped to 'comments' table with Many:One mapping
+    //One comment can have only one image but one image can have multiple comments
+    @OneToMany(mappedBy = "image", cascade = CascadeType.REMOVE, fetch = FetchType.LAZY) //User added
+    private List<Comment> comments = new ArrayList<>(); //User added
+
+    public List<Comment> getComments() {
+        return comments; //User added
+    }
+
+    public void setComments(List<Comment> comments) {
+        this.comments = comments; //User added
+    }
 
 
 
