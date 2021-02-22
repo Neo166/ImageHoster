@@ -1,8 +1,10 @@
 package ImageHoster.controller;
 
+import ImageHoster.model.Comment;
 import ImageHoster.model.Image;
 import ImageHoster.model.Tag;
 import ImageHoster.model.User;
+import ImageHoster.service.CommentService;
 import ImageHoster.service.ImageService;
 import ImageHoster.service.TagService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,6 +30,9 @@ public class ImageController {
     @Autowired
     private TagService tagService;
 
+    @Autowired
+    private CommentService commentService;
+
     //This method displays all the images in the user home page after successful login
     @RequestMapping("images")
     public String getUserImages(Model model) {
@@ -46,9 +51,13 @@ public class ImageController {
     //Also now you need to add the tags of an image in the Model type object
     //Here a list of tags is added in the Model type object
     //this list is then sent to 'images/image.html' file and the tags are displayed
+
+
     @RequestMapping("/images/{id}/{title}")
     public String showImage(@PathVariable("id") Integer id, @PathVariable("title") String title, Model model) { //Solution for Part A Issue 1: Images with same titles. Modified to use Image Id instead of Image Title.
         Image image = imageService.getImage(id);
+        //Solving the PartB Issue2: Adding comments feature.
+        model.addAttribute("comments", image.getComments());
         model.addAttribute("image", image);
         model.addAttribute("tags", image.getTags());
         return "images/image";
@@ -101,10 +110,14 @@ public class ImageController {
         model.addAttribute("image", image);
         model.addAttribute("tags", tags);
 
+
         if(image.getUser().getId()!=user.getId()){
             String error = "Only the owner of the image can edit the image";
             model.addAttribute("editError",error);
             model.addAttribute("tags",image.getTags());
+            model.addAttribute("image", image);
+            //Solving the PartB Issue2: Adding comments feature. If the user is not image owner then it will return displaying the image with all the tags and comments.
+            model.addAttribute("comments",image.getComments());
             return "images/image";
         }
         return "images/edit";
@@ -158,6 +171,10 @@ public class ImageController {
             model.addAttribute("image",image);
             String error = "Only the owner of the image can delete the image";
             model.addAttribute("deleteError",error);
+            model.addAttribute("image",image); // check this!
+            model.addAttribute("tags",image.getTags());
+            //Solving the PartB Issue2: Adding comments feature. If the user is not image owner then it will return displaying the image with all the tags and comments.
+            model.addAttribute("comments",image.getComments());
             return "images/image";
         }
         imageService.deleteImage(imageId);
